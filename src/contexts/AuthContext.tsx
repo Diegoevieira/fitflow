@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserStorage } from '@/lib/userStorage'
 
 interface User {
   id: string
@@ -44,27 +45,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth()
   }, [])
 
-  const login = async (email: string, _password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
     try {
-      // IMPORTANTE: Em produção, substitua por chamada real à API
-      // Exemplo: const response = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: _password }) })
-
-      // Simulação de login (substitua por API real)
+      // Simulação de delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000))
 
-      // Mock de usuário (em produção, virá da API)
-      const mockUser: User = {
-        id: '1',
-        name: email.split('@')[0],
-        email: email,
+      // Validar login usando UserStorage
+      const storedUser = UserStorage.validateLogin(email, password)
+
+      if (!storedUser) {
+        setIsLoading(false)
+        return false // Login inválido
+      }
+
+      // Criar objeto de usuário autenticado
+      const authenticatedUser: User = {
+        id: storedUser.id,
+        name: storedUser.name,
+        email: storedUser.email,
         plan: 'Premium',
         subscriptionStatus: 'active'
       }
 
-      setUser(mockUser)
-      localStorage.setItem('fitflow_auth', JSON.stringify(mockUser))
+      setUser(authenticatedUser)
+      localStorage.setItem('fitflow_auth', JSON.stringify(authenticatedUser))
       localStorage.setItem('fitflow_authenticated', 'true')
 
       setIsLoading(false)

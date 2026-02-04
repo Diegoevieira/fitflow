@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserStorage } from '@/lib/userStorage'
+import type { StoredUser } from '@/lib/userStorage'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -54,97 +56,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-interface User {
-  id: string
-  name: string
-  email: string
+// Tipo User com avatar (para UI)
+interface User extends StoredUser {
   avatar: string
-  plan: 'Premium'
-  status: 'active' | 'inactive' | 'suspended'
-  joinDate: string
-  lastActive: string
-  workoutsCompleted: number
-  streak: number
 }
 
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao',
-    plan: 'Premium',
-    status: 'active',
-    joinDate: '2024-01-15',
-    lastActive: '2024-02-04',
-    workoutsCompleted: 87,
-    streak: 12,
-  },
-  {
-    id: '2',
-    name: 'Maria Santos',
-    email: 'maria.santos@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria',
-    plan: 'Premium',
-    status: 'active',
-    joinDate: '2023-11-20',
-    lastActive: '2024-02-04',
-    workoutsCompleted: 156,
-    streak: 28,
-  },
-  {
-    id: '3',
-    name: 'Pedro Costa',
-    email: 'pedro.costa@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro',
-    plan: 'Premium',
-    status: 'active',
-    joinDate: '2024-02-01',
-    lastActive: '2024-02-03',
-    workoutsCompleted: 8,
-    streak: 3,
-  },
-  {
-    id: '4',
-    name: 'Ana Paula',
-    email: 'ana.paula@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ana',
-    plan: 'Premium',
-    status: 'active',
-    joinDate: '2023-12-10',
-    lastActive: '2024-02-04',
-    workoutsCompleted: 92,
-    streak: 15,
-  },
-  {
-    id: '5',
-    name: 'Carlos Mendes',
-    email: 'carlos.mendes@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos',
-    plan: 'Premium',
-    status: 'inactive',
-    joinDate: '2024-01-05',
-    lastActive: '2024-01-20',
-    workoutsCompleted: 12,
-    streak: 0,
-  },
-  {
-    id: '6',
-    name: 'Juliana Oliveira',
-    email: 'juliana.oliveira@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Juliana',
-    plan: 'Premium',
-    status: 'suspended',
-    joinDate: '2023-10-15',
-    lastActive: '2024-01-15',
-    workoutsCompleted: 45,
-    streak: 0,
-  },
-]
+// Converter StoredUser para User (adicionar avatar)
+function storedUserToUser(storedUser: StoredUser): User {
+  return {
+    ...storedUser,
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${storedUser.name}`
+  }
+}
 
 export function Admin() {
   const navigate = useNavigate()
-  const [users, setUsers] = useState<User[]>(mockUsers)
+  const [users, setUsers] = useState<User[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -153,7 +80,17 @@ export function Admin() {
   const [addUserDialog, setAddUserDialog] = useState(false)
   const [newUserEmail, setNewUserEmail] = useState('')
   const [newUserName, setNewUserName] = useState('')
-  const [newUserPlan, setNewUserPlan] = useState<User['plan']>('Premium')
+
+  // Carregar usuários do storage ao montar componente
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  const loadUsers = () => {
+    const storedUsers = UserStorage.getAll()
+    const usersWithAvatars = storedUsers.map(storedUserToUser)
+    setUsers(usersWithAvatars)
+  }
 
   // Statistics
   const totalUsers = users.length
@@ -170,13 +107,15 @@ export function Admin() {
   })
 
   const handleChangeStatus = (userId: string, newStatus: User['status']) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u))
+    UserStorage.update(userId, { status: newStatus })
+    loadUsers()
     toast.success('Status do usuário atualizado!')
   }
 
   const handleDeleteUser = () => {
     if (selectedUser) {
-      setUsers(prev => prev.filter(u => u.id !== selectedUser.id))
+      UserStorage.remove(selectedUser.id)
+      loadUsers()
       toast.success('Usuário removido com sucesso!')
       setDeleteUserDialog(false)
       setSelectedUser(null)
@@ -196,31 +135,30 @@ export function Admin() {
     }
 
     // Verificar se email já existe
-    const emailExists = users.some(u => u.email.toLowerCase() === newUserEmail.toLowerCase())
-    if (emailExists) {
+    if (UserStorage.emailExists(newUserEmail)) {
       toast.error('Este email já está cadastrado')
       return
     }
 
-    const newUser: User = {
-      id: Date.now().toString(),
+    // Adicionar usuário usando UserStorage
+    UserStorage.add({
       name: newUserName,
       email: newUserEmail,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newUserName}`,
-      plan: newUserPlan,
+      plan: 'Premium',
       status: 'active',
       joinDate: new Date().toISOString().split('T')[0],
       lastActive: new Date().toISOString().split('T')[0],
       workoutsCompleted: 0,
       streak: 0,
-    }
+    })
 
-    setUsers(prev => [newUser, ...prev])
-    toast.success('Usuário adicionado com sucesso!')
+    loadUsers()
+    toast.success('Usuário adicionado com sucesso!', {
+      description: 'Senha padrão: senha123'
+    })
     setAddUserDialog(false)
     setNewUserEmail('')
     setNewUserName('')
-    setNewUserPlan('Premium')
   }
 
   const getStatusBadge = (status: User['status']) => {
@@ -608,13 +546,21 @@ export function Admin() {
                 onChange={(e) => setNewUserEmail(e.target.value)}
               />
             </div>
+
+            <div className="rounded-lg bg-muted p-3 text-sm">
+              <p className="text-muted-foreground">
+                <strong>ℹ️ Senha padrão:</strong> senha123
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                O usuário poderá fazer login com esta senha após ser adicionado.
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setAddUserDialog(false)
               setNewUserEmail('')
               setNewUserName('')
-              setNewUserPlan('Premium')
             }}>
               Cancelar
             </Button>
