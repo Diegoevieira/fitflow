@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 export function Layout() {
   const location = useLocation()
 
-  // Simulação: verificar se usuário é admin (em produção, viria do contexto/auth)
-  const isAdmin = false // Apenas administradores tem acesso
+  // Verificar se usuário está autenticado como admin
+  const isAdmin = localStorage.getItem('fitflow_admin_authenticated') === 'true'
 
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },

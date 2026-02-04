@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,6 +45,7 @@ import {
   Mail,
   Calendar,
   Eye,
+  LogOut,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -143,6 +145,7 @@ const mockUsers: User[] = [
 ]
 
 export function Admin() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -185,6 +188,12 @@ export function Admin() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('fitflow_admin_authenticated')
+    toast.success('Logout realizado com sucesso!')
+    navigate('/admin/login')
+  }
+
   const getStatusBadge = (status: User['status']) => {
     const variants = {
       active: 'default',
@@ -216,14 +225,20 @@ export function Admin() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Shield className="h-8 w-8 text-primary" />
-          Painel de Administração
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Gerencie usuários, planos e acesso ao FitFlow
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Shield className="h-8 w-8 text-primary" />
+            Painel de Administração
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Gerencie usuários, planos e acesso ao FitFlow
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Sair
+        </Button>
       </div>
 
       {/* Statistics */}
