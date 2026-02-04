@@ -4,18 +4,16 @@ import { UserProgressStorage } from '@/lib/userProgress'
 import type { UserProgress } from '@/lib/userProgress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Link } from 'react-router-dom'
 import {
   Dumbbell,
-  Apple,
-  Flame,
   TrendingUp,
   CheckCircle2,
   Clock,
   Calendar,
   ArrowRight,
+  Utensils,
 } from 'lucide-react'
 
 export function Dashboard() {
@@ -68,14 +66,7 @@ export function Dashboard() {
     hydration: { completed: 0, goal: 2000 }
   }
 
-  // Obter dados de nutrição (resetado diariamente)
-  const nutrition = UserProgressStorage.getNutrition(user.id)
-
   const todayStats = {
-    caloriesConsumed: nutrition.calories.consumed,
-    caloriesTarget: nutrition.calories.target,
-    proteinConsumed: nutrition.protein.consumed,
-    proteinTarget: nutrition.protein.target,
     workoutCompleted: progress.workoutsCompleted > 0,
     currentStreak: progress.streak,
   }
@@ -103,43 +94,7 @@ export function Dashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-primary/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center text-muted-foreground">
-              <Flame className="h-4 w-4 mr-2 text-primary" />
-              Calorias Hoje
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {todayStats.caloriesConsumed} <span className="text-sm text-muted-foreground">/ {todayStats.caloriesTarget}</span>
-            </div>
-            <Progress
-              value={(todayStats.caloriesConsumed / todayStats.caloriesTarget) * 100}
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-
-        <Card className="border-primary/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center text-muted-foreground">
-              <Apple className="h-4 w-4 mr-2 text-primary" />
-              Proteínas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {todayStats.proteinConsumed}g <span className="text-sm text-muted-foreground">/ {todayStats.proteinTarget}g</span>
-            </div>
-            <Progress
-              value={(todayStats.proteinConsumed / todayStats.proteinTarget) * 100}
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         <Card className="border-primary/20">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center text-muted-foreground">
@@ -228,7 +183,7 @@ export function Dashboard() {
               >
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
-                    <Apple className="h-5 w-5 text-primary" />
+                    <Utensils className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium">{meal.name}</p>
@@ -263,7 +218,7 @@ export function Dashboard() {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
                 <div className="p-3 rounded-full bg-secondary/10 mb-3">
-                  <Apple className="h-6 w-6 text-secondary" />
+                  <Utensils className="h-6 w-6 text-secondary" />
                 </div>
                 <h3 className="font-semibold mb-1">Minha Dieta</h3>
                 <p className="text-sm text-muted-foreground">Veja seu plano alimentar</p>
