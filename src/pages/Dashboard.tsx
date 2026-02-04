@@ -19,18 +19,48 @@ import {
 } from 'lucide-react'
 
 export function Dashboard() {
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
 
   useEffect(() => {
     if (user) {
-      const progress = UserProgressStorage.get(user.id)
-      setUserProgress(progress)
+      try {
+        const progress = UserProgressStorage.get(user.id)
+        setUserProgress(progress)
+      } catch (error) {
+        console.error('Erro ao carregar progresso:', error)
+      }
     }
   }, [user])
 
-  if (!user || !userProgress) {
-    return null
+  // Mostrar loading enquanto autentica
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se não tem usuário após carregar, mostrar mensagem
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Faça login para ver seu dashboard</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se não tem progresso ainda, inicializar com valores padrão
+  const progress = userProgress || {
+    workoutsCompleted: 0,
+    streak: 0,
+    hydration: { completed: 0, goal: 2000 }
   }
 
   const todayStats = {
@@ -38,8 +68,8 @@ export function Dashboard() {
     caloriesTarget: 2200,
     proteinConsumed: 145,
     proteinTarget: 180,
-    workoutCompleted: userProgress.workoutsCompleted > 0,
-    currentStreak: userProgress.streak,
+    workoutCompleted: progress.workoutsCompleted > 0,
+    currentStreak: progress.streak,
   }
 
   const todayWorkout = {
