@@ -59,7 +59,7 @@ interface User {
   name: string
   email: string
   avatar: string
-  plan: 'Free' | 'Premium' | 'Elite'
+  plan: 'Premium'
   status: 'active' | 'inactive' | 'suspended'
   joinDate: string
   lastActive: string
@@ -85,7 +85,7 @@ const mockUsers: User[] = [
     name: 'Maria Santos',
     email: 'maria.santos@email.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria',
-    plan: 'Elite',
+    plan: 'Premium',
     status: 'active',
     joinDate: '2023-11-20',
     lastActive: '2024-02-04',
@@ -97,7 +97,7 @@ const mockUsers: User[] = [
     name: 'Pedro Costa',
     email: 'pedro.costa@email.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro',
-    plan: 'Free',
+    plan: 'Premium',
     status: 'active',
     joinDate: '2024-02-01',
     lastActive: '2024-02-03',
@@ -121,7 +121,7 @@ const mockUsers: User[] = [
     name: 'Carlos Mendes',
     email: 'carlos.mendes@email.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos',
-    plan: 'Free',
+    plan: 'Premium',
     status: 'inactive',
     joinDate: '2024-01-05',
     lastActive: '2024-01-20',
@@ -147,19 +147,18 @@ export function Admin() {
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [planFilter, setPlanFilter] = useState<string>('all')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [viewUserDialog, setViewUserDialog] = useState(false)
   const [deleteUserDialog, setDeleteUserDialog] = useState(false)
   const [addUserDialog, setAddUserDialog] = useState(false)
   const [newUserEmail, setNewUserEmail] = useState('')
   const [newUserName, setNewUserName] = useState('')
-  const [newUserPlan, setNewUserPlan] = useState<User['plan']>('Free')
+  const [newUserPlan, setNewUserPlan] = useState<User['plan']>('Premium')
 
   // Statistics
   const totalUsers = users.length
   const activeUsers = users.filter(u => u.status === 'active').length
-  const premiumUsers = users.filter(u => u.plan === 'Premium' || u.plan === 'Elite').length
+  const premiumUsers = users.filter(u => u.plan === 'Premium').length
   const totalWorkouts = users.reduce((sum, u) => sum + u.workoutsCompleted, 0)
 
   // Filtered users
@@ -167,18 +166,12 @@ export function Admin() {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter
-    const matchesPlan = planFilter === 'all' || user.plan === planFilter
-    return matchesSearch && matchesStatus && matchesPlan
+    return matchesSearch && matchesStatus
   })
 
   const handleChangeStatus = (userId: string, newStatus: User['status']) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u))
     toast.success('Status do usuário atualizado!')
-  }
-
-  const handleChangePlan = (userId: string, newPlan: User['plan']) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, plan: newPlan } : u))
-    toast.success('Plano do usuário atualizado!')
   }
 
   const handleDeleteUser = () => {
@@ -227,7 +220,7 @@ export function Admin() {
     setAddUserDialog(false)
     setNewUserEmail('')
     setNewUserName('')
-    setNewUserPlan('Free')
+    setNewUserPlan('Premium')
   }
 
   const getStatusBadge = (status: User['status']) => {
@@ -245,14 +238,9 @@ export function Admin() {
   }
 
   const getPlanBadge = (plan: User['plan']) => {
-    const colors = {
-      Free: 'bg-muted text-muted-foreground',
-      Premium: 'bg-primary text-primary-foreground',
-      Elite: 'bg-accent text-accent-foreground',
-    }
     return (
-      <Badge className={colors[plan]}>
-        {plan === 'Elite' && <Crown className="h-3 w-3 mr-1" />}
+      <Badge className="bg-primary text-primary-foreground">
+        <Crown className="h-3 w-3 mr-1" />
         {plan}
       </Badge>
     )
@@ -366,19 +354,6 @@ export function Admin() {
                 <SelectItem value="suspended">Suspenso</SelectItem>
               </SelectContent>
             </Select>
-
-            <Select value={planFilter} onValueChange={setPlanFilter}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Plano" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos Planos</SelectItem>
-                <SelectItem value="Free">Free</SelectItem>
-                <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="Elite">Elite</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="text-sm text-muted-foreground">
@@ -394,7 +369,6 @@ export function Admin() {
             <TableHeader>
               <TableRow>
                 <TableHead>Usuário</TableHead>
-                <TableHead>Plano</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Cadastro</TableHead>
                 <TableHead>Último Acesso</TableHead>
@@ -418,7 +392,6 @@ export function Admin() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{getPlanBadge(user.plan)}</TableCell>
                   <TableCell>{getStatusBadge(user.status)}</TableCell>
                   <TableCell>{new Date(user.joinDate).toLocaleDateString('pt-BR')}</TableCell>
                   <TableCell>{new Date(user.lastActive).toLocaleDateString('pt-BR')}</TableCell>
@@ -542,23 +515,6 @@ export function Admin() {
                 <TabsContent value="actions" className="space-y-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Alterar Plano</label>
-                      <Select
-                        value={selectedUser.plan}
-                        onValueChange={(value) => handleChangePlan(selectedUser.id, value as User['plan'])}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Free">Free</SelectItem>
-                          <SelectItem value="Premium">Premium</SelectItem>
-                          <SelectItem value="Elite">Elite</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
                       <label className="text-sm font-medium">Alterar Status</label>
                       <Select
                         value={selectedUser.status}
@@ -652,27 +608,13 @@ export function Admin() {
                 onChange={(e) => setNewUserEmail(e.target.value)}
               />
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Plano</label>
-              <Select value={newUserPlan} onValueChange={(value) => setNewUserPlan(value as User['plan'])}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Free">Free</SelectItem>
-                  <SelectItem value="Premium">Premium</SelectItem>
-                  <SelectItem value="Elite">Elite</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setAddUserDialog(false)
               setNewUserEmail('')
               setNewUserName('')
-              setNewUserPlan('Free')
+              setNewUserPlan('Premium')
             }}>
               Cancelar
             </Button>
