@@ -30,21 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Verificar se usuário está autenticado ao carregar
     const checkAuth = () => {
-      let authData = localStorage.getItem('fitflow_auth')
+      const authData = localStorage.getItem('fitflow_auth')
 
-      // Se não há usuário autenticado, criar um usuário padrão
-      if (!authData) {
-        const defaultUser: User = {
-          id: 'default-user-001',
-          name: 'Usuário',
-          email: 'usuario@fitflow.com',
-          plan: 'Premium',
-          subscriptionStatus: 'active'
-        }
-        localStorage.setItem('fitflow_auth', JSON.stringify(defaultUser))
-        localStorage.setItem('fitflow_authenticated', 'true')
-        setUser(defaultUser)
-      } else {
+      if (authData) {
         try {
           const userData = JSON.parse(authData)
           setUser(userData)
