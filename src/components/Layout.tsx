@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Dumbbell, Apple, Users, User } from 'lucide-react'
+import { Home, Dumbbell, Apple, Droplets, Users, User } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
@@ -10,6 +10,7 @@ export function Layout() {
     { path: '/', icon: Home, label: 'Início' },
     { path: '/workouts', icon: Dumbbell, label: 'Treinos' },
     { path: '/diet', icon: Apple, label: 'Dieta' },
+    { path: '/hydration', icon: Droplets, label: 'Hidratação' },
     { path: '/community', icon: Users, label: 'Comunidade' },
     { path: '/profile', icon: User, label: 'Perfil' },
   ]
