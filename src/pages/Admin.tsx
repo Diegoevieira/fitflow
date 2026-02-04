@@ -43,6 +43,7 @@ import {
   Mail,
   Eye,
   LogOut,
+  UserPlus,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -150,6 +151,10 @@ export function Admin() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [viewUserDialog, setViewUserDialog] = useState(false)
   const [deleteUserDialog, setDeleteUserDialog] = useState(false)
+  const [addUserDialog, setAddUserDialog] = useState(false)
+  const [newUserEmail, setNewUserEmail] = useState('')
+  const [newUserName, setNewUserName] = useState('')
+  const [newUserPlan, setNewUserPlan] = useState<User['plan']>('Free')
 
   // Statistics
   const totalUsers = users.length
@@ -189,6 +194,40 @@ export function Admin() {
     localStorage.removeItem('fitflow_admin_authenticated')
     toast.success('Logout realizado com sucesso!')
     navigate('/admin/login')
+  }
+
+  const handleAddUser = () => {
+    if (!newUserEmail || !newUserName) {
+      toast.error('Preencha todos os campos obrigatórios')
+      return
+    }
+
+    // Verificar se email já existe
+    const emailExists = users.some(u => u.email.toLowerCase() === newUserEmail.toLowerCase())
+    if (emailExists) {
+      toast.error('Este email já está cadastrado')
+      return
+    }
+
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: newUserName,
+      email: newUserEmail,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newUserName}`,
+      plan: newUserPlan,
+      status: 'active',
+      joinDate: new Date().toISOString().split('T')[0],
+      lastActive: new Date().toISOString().split('T')[0],
+      workoutsCompleted: 0,
+      streak: 0,
+    }
+
+    setUsers(prev => [newUser, ...prev])
+    toast.success('Usuário adicionado com sucesso!')
+    setAddUserDialog(false)
+    setNewUserEmail('')
+    setNewUserName('')
+    setNewUserPlan('Free')
   }
 
   const getStatusBadge = (status: User['status']) => {
@@ -232,10 +271,16 @@ export function Admin() {
             Gerencie usuários, planos e acesso ao FitFlow
           </p>
         </div>
-        <Button variant="outline" onClick={handleLogout}>
-          <LogOut className="h-4 w-4 mr-2" />
-          Sair
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setAddUserDialog(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Adicionar Usuário
+          </Button>
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+        </div>
       </div>
 
       {/* Statistics */}
@@ -565,6 +610,75 @@ export function Admin() {
             <Button variant="destructive" onClick={handleDeleteUser}>
               <Trash2 className="h-4 w-4 mr-2" />
               Remover Usuário
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Dialog */}
+      <Dialog open={addUserDialog} onOpenChange={setAddUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-primary" />
+              Adicionar Novo Usuário
+            </DialogTitle>
+            <DialogDescription>
+              Preencha os dados abaixo para adicionar um novo usuário ao FitFlow
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="new-user-name">
+                Nome Completo *
+              </label>
+              <Input
+                id="new-user-name"
+                placeholder="Ex: João Silva"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="new-user-email">
+                Email *
+              </label>
+              <Input
+                id="new-user-email"
+                type="email"
+                placeholder="Ex: joao.silva@email.com"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Plano</label>
+              <Select value={newUserPlan} onValueChange={(value) => setNewUserPlan(value as User['plan'])}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Free">Free</SelectItem>
+                  <SelectItem value="Premium">Premium</SelectItem>
+                  <SelectItem value="Elite">Elite</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setAddUserDialog(false)
+              setNewUserEmail('')
+              setNewUserName('')
+              setNewUserPlan('Free')
+            }}>
+              Cancelar
+            </Button>
+            <Button onClick={handleAddUser}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Adicionar Usuário
             </Button>
           </DialogFooter>
         </DialogContent>
