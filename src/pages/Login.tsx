@@ -1,76 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Mail, Lock, Eye, EyeOff, Dumbbell, Apple, Droplets, Users } from 'lucide-react'
-import { toast } from 'sonner'
+import { Dumbbell, Apple, Droplets, Users, ArrowRight } from 'lucide-react'
 
 export function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!email || !password) {
-      toast.error('Preencha todos os campos')
-      return
-    }
-
+  const handleAccess = () => {
     setIsLoading(true)
 
-    // Usar o contexto de autenticação
-    const success = await login(email, password)
-
-    if (success) {
-      if (rememberMe) {
-        localStorage.setItem('fitflow_remember', 'true')
-      }
-
-      // Verificar se é primeira vez do usuário
-      const authData = localStorage.getItem('fitflow_auth')
-      if (authData) {
-        const userData = JSON.parse(authData)
-        const hasCompletedOnboarding = localStorage.getItem(`fitflow_onboarding_${userData.id}`)
-
-        if (!hasCompletedOnboarding) {
-          // Primeiro login - redirecionar para welcome
-          toast.success('Bem-vindo ao FitFlow!', {
-            description: 'Vamos configurar sua conta',
-          })
-
-          setTimeout(() => {
-            navigate('/welcome')
-          }, 1000)
-          setIsLoading(false)
-          return
-        }
-      }
-
-      toast.success('Login realizado com sucesso!', {
-        description: 'Bem-vindo de volta ao FitFlow',
-      })
-
-      // Redirecionar para dashboard
-      setTimeout(() => {
-        navigate('/')
-      }, 1000)
-    } else {
-      toast.error('Email ou senha incorretos', {
-        description: 'Verifique seus dados e tente novamente'
-      })
-    }
-
-    setIsLoading(false)
+    // Simular um pequeno delay para melhor UX
+    setTimeout(() => {
+      // Redirecionar direto para o dashboard
+      navigate('/')
+      setIsLoading(false)
+    }, 500)
   }
 
   return (
@@ -125,7 +71,7 @@ export function Login() {
           </div>
         </div>
 
-        {/* Right Side - Login Form */}
+        {/* Right Side - Access Button */}
         <Card className="w-full">
           <CardHeader className="text-center md:hidden">
             <img
@@ -135,85 +81,82 @@ export function Login() {
             />
           </CardHeader>
 
-          <CardHeader>
-            <CardTitle>Entrar na sua conta</CardTitle>
-            <CardDescription>
-              Entre com seu email e senha para acessar o FitFlow
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Acesse o FitFlow</CardTitle>
+            <CardDescription className="text-base">
+              Clique no botão abaixo para acessar todos os recursos do aplicativo
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    className="pl-10"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className="pl-10 pr-10"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="remember"
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                  />
-                  <label
-                    htmlFor="remember"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Lembrar-me
-                  </label>
-                </div>
-                <Button variant="link" className="px-0 text-sm">
-                  Esqueceu a senha?
-                </Button>
-              </div>
-
-              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+          <CardContent className="flex flex-col items-center space-y-6 py-8">
+            <div className="w-full max-w-sm space-y-4">
+              <Button
+                onClick={handleAccess}
+                className="w-full"
+                size="lg"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
-                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                    Entrando...
+                    <div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                    Acessando...
                   </>
                 ) : (
-                  'Entrar'
+                  <>
+                    Acessar Conteúdo
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </>
                 )}
               </Button>
-            </form>
+
+              <p className="text-xs text-center text-muted-foreground">
+                Ao acessar, você terá acesso a treinos, dieta, hidratação e comunidade
+              </p>
+            </div>
+
+            {/* Features preview */}
+            <div className="w-full max-w-sm space-y-3 pt-4 border-t border-border">
+              <p className="text-sm font-medium text-center mb-3">O que você encontrará:</p>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Dumbbell className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Treinos de Segunda a Sábado</p>
+                  <p className="text-xs text-muted-foreground">Planos completos de exercícios</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-secondary/10">
+                  <Apple className="h-4 w-4 text-secondary" />
+                </div>
+                <div>
+                  <p className="font-medium">Plano Alimentar Semanal</p>
+                  <p className="text-xs text-muted-foreground">Dieta balanceada (domingo livre!)</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <Droplets className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium">Controle de Hidratação</p>
+                  <p className="text-xs text-muted-foreground">Acompanhe sua meta diária</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Comunidade FitFlow</p>
+                  <p className="text-xs text-muted-foreground">Compartilhe seu progresso</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
