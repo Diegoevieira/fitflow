@@ -1,7 +1,8 @@
-import { useState, FormEvent } from 'react'
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field } from '@/components/ui/field'
+import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Shield, Lock, User as UserIcon } from 'lucide-react'
@@ -60,10 +61,12 @@ export function AdminLogin() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
-              <Field label="Usuário" required>
+              <div className="space-y-2">
+                <Label htmlFor="username">Usuário *</Label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
+                    id="username"
                     type="text"
                     placeholder="Digite o usuário"
                     value={username}
@@ -72,12 +75,14 @@ export function AdminLogin() {
                     required
                   />
                 </div>
-              </Field>
+              </div>
 
-              <Field label="Senha" required>
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha *</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
+                    id="password"
                     type="password"
                     placeholder="Digite a senha"
                     value={password}
@@ -86,7 +91,7 @@ export function AdminLogin() {
                     required
                   />
                 </div>
-              </Field>
+              </div>
 
               <Button
                 type="submit"
