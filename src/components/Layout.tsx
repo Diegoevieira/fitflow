@@ -1,10 +1,13 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Dumbbell, Apple, Droplets, Users, User } from 'lucide-react'
+import { Home, Dumbbell, Apple, Droplets, Users, User, Shield } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
 export function Layout() {
   const location = useLocation()
+
+  // Simulação: verificar se usuário é admin (em produção, viria do contexto/auth)
+  const isAdmin = true // Altere para false para usuários normais
 
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
@@ -13,6 +16,7 @@ export function Layout() {
     { path: '/hydration', icon: Droplets, label: 'Hidratação' },
     { path: '/community', icon: Users, label: 'Comunidade' },
     { path: '/profile', icon: User, label: 'Perfil' },
+    ...(isAdmin ? [{ path: '/admin', icon: Shield, label: 'Admin' }] : []),
   ]
 
   return (

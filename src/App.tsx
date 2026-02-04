@@ -8,6 +8,7 @@ import { Hydration } from '@/pages/Hydration'
 import { Community } from '@/pages/Community'
 import { Profile } from '@/pages/Profile'
 import { EditProfile } from '@/pages/EditProfile'
+import { Admin } from '@/pages/Admin'
 import { Toaster } from '@/components/ui/sonner'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="community" element={<Community />} />
           <Route path="profile" element={<Profile />} />
           <Route path="profile/edit" element={<EditProfile />} />
+          <Route path="admin" element={<Admin />} />
         </Route>
       </Routes>
       <Toaster />
