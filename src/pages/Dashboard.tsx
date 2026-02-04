@@ -60,14 +60,22 @@ export function Dashboard() {
   const progress = userProgress || {
     workoutsCompleted: 0,
     streak: 0,
+    nutrition: {
+      date: new Date().toISOString().split('T')[0],
+      calories: { consumed: 0, target: 2200 },
+      protein: { consumed: 0, target: 180 }
+    },
     hydration: { completed: 0, goal: 2000 }
   }
 
+  // Obter dados de nutrição (resetado diariamente)
+  const nutrition = UserProgressStorage.getNutrition(user.id)
+
   const todayStats = {
-    caloriesConsumed: 1850,
-    caloriesTarget: 2200,
-    proteinConsumed: 145,
-    proteinTarget: 180,
+    caloriesConsumed: nutrition.calories.consumed,
+    caloriesTarget: nutrition.calories.target,
+    proteinConsumed: nutrition.protein.consumed,
+    proteinTarget: nutrition.protein.target,
     workoutCompleted: progress.workoutsCompleted > 0,
     currentStreak: progress.streak,
   }

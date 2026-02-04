@@ -5,6 +5,17 @@ export interface UserProgress {
   workoutsCompleted: number
   streak: number
   lastWorkoutDate?: string
+  nutrition: {
+    date: string
+    calories: {
+      consumed: number
+      target: number
+    }
+    protein: {
+      consumed: number
+      target: number
+    }
+  }
   hydration: {
     date: string
     completed: number // ml de água consumidos
@@ -41,6 +52,17 @@ export class UserProgressStorage {
       userId,
       workoutsCompleted: 0,
       streak: 0,
+      nutrition: {
+        date: new Date().toISOString().split('T')[0],
+        calories: {
+          consumed: 0,
+          target: 2200
+        },
+        protein: {
+          consumed: 0,
+          target: 180
+        }
+      },
       hydration: {
         date: new Date().toISOString().split('T')[0],
         completed: 0,
@@ -178,6 +200,60 @@ export class UserProgressStorage {
     this.save(userId, progress)
   }
 
+  // Atualizar calorias
+  static updateCalories(userId: string, amount: number): void {
+    const progress = this.get(userId)
+    const today = new Date().toISOString().split('T')[0]
+
+    // Resetar nutrição se for um novo dia
+    if (progress.nutrition.date !== today) {
+      progress.nutrition = {
+        date: today,
+        calories: { consumed: 0, target: 2200 },
+        protein: { consumed: 0, target: 180 }
+      }
+    }
+
+    progress.nutrition.calories.consumed += amount
+    this.save(userId, progress)
+  }
+
+  // Atualizar proteínas
+  static updateProtein(userId: string, amount: number): void {
+    const progress = this.get(userId)
+    const today = new Date().toISOString().split('T')[0]
+
+    // Resetar nutrição se for um novo dia
+    if (progress.nutrition.date !== today) {
+      progress.nutrition = {
+        date: today,
+        calories: { consumed: 0, target: 2200 },
+        protein: { consumed: 0, target: 180 }
+      }
+    }
+
+    progress.nutrition.protein.consumed += amount
+    this.save(userId, progress)
+  }
+
+  // Obter nutrição do dia
+  static getNutrition(userId: string) {
+    const progress = this.get(userId)
+    const today = new Date().toISOString().split('T')[0]
+
+    // Resetar se for um novo dia
+    if (progress.nutrition.date !== today) {
+      progress.nutrition = {
+        date: today,
+        calories: { consumed: 0, target: 2200 },
+        protein: { consumed: 0, target: 180 }
+      }
+      this.save(userId, progress)
+    }
+
+    return progress.nutrition
+  }
+
   // Logs de hidratação padrão
   static getDefaultHydrationLogs() {
     return [
@@ -217,6 +293,11 @@ export class UserProgressStorage {
       userId,
       workoutsCompleted: 0,
       streak: 0,
+      nutrition: {
+        date: new Date().toISOString().split('T')[0],
+        calories: { consumed: 0, target: 2200 },
+        protein: { consumed: 0, target: 180 }
+      },
       hydration: {
         date: new Date().toISOString().split('T')[0],
         completed: 0,

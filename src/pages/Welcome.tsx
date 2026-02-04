@@ -230,6 +230,28 @@ export function Welcome() {
                     <Progress value={0} className="w-32 mt-2" />
                   </div>
                 </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                  <div>
+                    <p className="font-medium">Calorias Consumidas</p>
+                    <p className="text-2xl font-bold text-primary">0 kcal</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Meta: 2200 kcal</p>
+                    <Progress value={0} className="w-32 mt-2" />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                  <div>
+                    <p className="font-medium">Proteínas Consumidas</p>
+                    <p className="text-2xl font-bold text-secondary">0g</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Meta: 180g</p>
+                    <Progress value={0} className="w-32 mt-2" />
+                  </div>
+                </div>
               </div>
 
               {/* Mensagem Motivacional */}
