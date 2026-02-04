@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { Layout } from '@/components/Layout'
 import { Login } from '@/pages/Login'
 import { AdminLogin } from '@/pages/AdminLogin'
+import { Welcome } from '@/pages/Welcome'
 import { Dashboard } from '@/pages/Dashboard'
 import { Workouts } from '@/pages/Workouts'
 import { Diet } from '@/pages/Diet'
@@ -20,6 +21,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="workouts" element={<Workouts />} />

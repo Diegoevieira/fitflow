@@ -36,6 +36,26 @@ export function Login() {
         localStorage.setItem('fitflow_remember', 'true')
       }
 
+      // Verificar se é primeira vez do usuário
+      const authData = localStorage.getItem('fitflow_auth')
+      if (authData) {
+        const userData = JSON.parse(authData)
+        const hasCompletedOnboarding = localStorage.getItem(`fitflow_onboarding_${userData.id}`)
+
+        if (!hasCompletedOnboarding) {
+          // Primeiro login - redirecionar para welcome
+          toast.success('Bem-vindo ao FitFlow!', {
+            description: 'Vamos configurar sua conta',
+          })
+
+          setTimeout(() => {
+            navigate('/welcome')
+          }, 1000)
+          setIsLoading(false)
+          return
+        }
+      }
+
       toast.success('Login realizado com sucesso!', {
         description: 'Bem-vindo de volta ao FitFlow',
       })
