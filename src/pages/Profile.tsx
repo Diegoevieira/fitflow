@@ -40,10 +40,23 @@ export function Profile() {
     return null
   }
 
+  // Calcular data de cadastro a partir do ID do usuário
+  const getUserJoinDate = () => {
+    if (user.id.startsWith('user-')) {
+      const timestamp = parseInt(user.id.replace('user-', ''))
+      if (!isNaN(timestamp)) {
+        const date = new Date(timestamp)
+        return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      }
+    }
+    return 'Janeiro 2024'
+  }
+
   const userData = {
     name: user.name,
     email: user.email,
-    joinDate: 'Janeiro 2024',
+    age: (user as any).age || null, // Pegar idade se existir
+    joinDate: getUserJoinDate(),
     plan: 'Premium',
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`,
   }
@@ -98,6 +111,12 @@ export function Profile() {
                   <Mail className="h-4 w-4 mr-2" />
                   {userData.email}
                 </div>
+                {userData.age && (
+                  <div className="flex items-center justify-center md:justify-start">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {userData.age} anos
+                  </div>
+                )}
                 <div className="flex items-center justify-center md:justify-start">
                   <Calendar className="h-4 w-4 mr-2" />
                   Membro desde {userData.joinDate}
@@ -246,6 +265,12 @@ export function Profile() {
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" defaultValue={userData.email} />
               </div>
+              {userData.age && (
+                <div className="space-y-2">
+                  <Label htmlFor="age">Idade</Label>
+                  <Input id="age" type="number" defaultValue={userData.age} min="1" max="120" />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone</Label>
                 <Input id="phone" type="tel" placeholder="(00) 00000-0000" />

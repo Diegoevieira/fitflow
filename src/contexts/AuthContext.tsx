@@ -7,6 +7,7 @@ interface User {
   id: string
   name: string
   email: string
+  age?: number
   plan: 'Premium'
   subscriptionId?: string
   subscriptionStatus?: 'active' | 'canceled' | 'past_due'
