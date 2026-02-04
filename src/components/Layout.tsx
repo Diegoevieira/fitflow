@@ -34,18 +34,23 @@ export function Layout() {
               className="h-16 w-auto object-contain"
             />
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {user && (
-              <div className="hidden md:flex items-center gap-2 text-sm">
+              <div className="hidden md:flex items-center gap-2 text-sm mr-2">
                 <span className="text-muted-foreground">Olá,</span>
                 <span className="font-medium">{user.name}</span>
               </div>
             )}
             <ThemeToggle />
             {user && (
-              <Button variant="ghost" size="sm" onClick={logout} className="hidden md:flex">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={logout}
+                title="Sair"
+                className="h-9 w-9"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
             )}
           </div>
