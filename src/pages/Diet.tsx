@@ -380,8 +380,6 @@ const dietPlans: DayPlan[] = [
 export function Diet() {
   const [selectedDay, setSelectedDay] = useState('Segunda')
 
-  const currentPlan = dietPlans.find(plan => plan.day === selectedDay)
-
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="space-y-6">
