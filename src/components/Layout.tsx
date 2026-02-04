@@ -7,7 +7,7 @@ export function Layout() {
   const location = useLocation()
 
   // Simulação: verificar se usuário é admin (em produção, viria do contexto/auth)
-  const isAdmin = true // Altere para false para usuários normais
+  const isAdmin = false // Apenas administradores tem acesso
 
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
