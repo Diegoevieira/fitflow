@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { Layout } from '@/components/Layout'
 import { Login } from '@/pages/Login'
 import { AdminLogin } from '@/pages/AdminLogin'
@@ -15,7 +16,7 @@ import { Toaster } from '@/components/ui/sonner'
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -38,7 +39,7 @@ function App() {
         </Route>
       </Routes>
       <Toaster />
-    </>
+    </AuthProvider>
   )
 }
 

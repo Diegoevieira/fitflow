@@ -1,10 +1,13 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Dumbbell, Apple, Droplets, Users, User, Shield } from 'lucide-react'
+import { Home, Dumbbell, Apple, Droplets, Users, User, Shield, LogOut } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { useAuth } from '@/contexts/AuthContext'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export function Layout() {
   const location = useLocation()
+  const { user, logout } = useAuth()
 
   // Verificar se usuário está autenticado como admin
   const isAdmin = localStorage.getItem('fitflow_admin_authenticated') === 'true'
@@ -31,7 +34,21 @@ export function Layout() {
               className="h-16 w-auto object-contain"
             />
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="hidden md:flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Olá,</span>
+                <span className="font-medium">{user.name}</span>
+              </div>
+            )}
+            <ThemeToggle />
+            {user && (
+              <Button variant="ghost" size="sm" onClick={logout} className="hidden md:flex">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,12 +11,14 @@ import { toast } from 'sonner'
 
 export function Login() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!email || !password) {
@@ -23,21 +26,31 @@ export function Login() {
       return
     }
 
-    // Simulação de login
-    toast.success('Login realizado com sucesso!', {
-      description: 'Bem-vindo de volta ao FitFlow',
-    })
+    setIsLoading(true)
 
-    // Salvar estado de autenticação
-    localStorage.setItem('fitflow_authenticated', 'true')
-    if (rememberMe) {
-      localStorage.setItem('fitflow_remember', 'true')
+    // Usar o contexto de autenticação
+    const success = await login(email, password)
+
+    if (success) {
+      if (rememberMe) {
+        localStorage.setItem('fitflow_remember', 'true')
+      }
+
+      toast.success('Login realizado com sucesso!', {
+        description: 'Bem-vindo de volta ao FitFlow',
+      })
+
+      // Redirecionar para dashboard
+      setTimeout(() => {
+        navigate('/')
+      }, 1000)
+    } else {
+      toast.error('Email ou senha incorretos', {
+        description: 'Verifique seus dados e tente novamente'
+      })
     }
 
-    // Redirecionar para dashboard
-    setTimeout(() => {
-      navigate('/')
-    }, 1000)
+    setIsLoading(false)
   }
 
   return (
@@ -170,8 +183,15 @@ export function Login() {
                 </Button>
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
-                Entrar
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                    Entrando...
+                  </>
+                ) : (
+                  'Entrar'
+                )}
               </Button>
             </form>
           </CardContent>
