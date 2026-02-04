@@ -97,7 +97,7 @@ export function Profile() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button>
+              <Button onClick={() => navigate('/profile/edit')}>
                 <Settings className="h-4 w-4 mr-2" />
                 Editar Perfil
               </Button>
