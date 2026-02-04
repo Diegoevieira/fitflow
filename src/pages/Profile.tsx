@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -16,11 +17,23 @@ import {
   Target,
   Crown,
   Settings,
+  LogOut,
 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
 
 export function Profile() {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('fitflow_authenticated')
+    localStorage.removeItem('fitflow_remember')
+    toast.success('Logout realizado com sucesso!')
+    setTimeout(() => {
+      navigate('/login')
+    }, 1000)
+  }
   const userData = {
     name: 'João Silva',
     email: 'joao.silva@email.com',
@@ -85,10 +98,16 @@ export function Profile() {
                 </div>
               </div>
             </div>
-            <Button>
-              <Settings className="h-4 w-4 mr-2" />
-              Editar Perfil
-            </Button>
+            <div className="flex gap-2">
+              <Button>
+                <Settings className="h-4 w-4 mr-2" />
+                Editar Perfil
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
