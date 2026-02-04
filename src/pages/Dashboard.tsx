@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserProgressStorage } from '@/lib/userProgress'
+import type { UserProgress } from '@/lib/userProgress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -15,13 +19,27 @@ import {
 } from 'lucide-react'
 
 export function Dashboard() {
+  const { user } = useAuth()
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
+
+  useEffect(() => {
+    if (user) {
+      const progress = UserProgressStorage.get(user.id)
+      setUserProgress(progress)
+    }
+  }, [user])
+
+  if (!user || !userProgress) {
+    return null
+  }
+
   const todayStats = {
     caloriesConsumed: 1850,
     caloriesTarget: 2200,
     proteinConsumed: 145,
     proteinTarget: 180,
-    workoutCompleted: false,
-    currentStreak: 12,
+    workoutCompleted: userProgress.workoutsCompleted > 0,
+    currentStreak: userProgress.streak,
   }
 
   const todayWorkout = {
@@ -40,7 +58,7 @@ export function Dashboard() {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-3xl font-bold">Olá, João! 👋</h1>
+        <h1 className="text-3xl font-bold">Olá, {user.name}! 👋</h1>
         <p className="text-muted-foreground mt-2">
           Vamos continuar sua jornada fitness hoje
         </p>

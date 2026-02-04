@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserProgressStorage } from '@/lib/userProgress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -13,28 +15,38 @@ interface WaterLog {
   completed: boolean
 }
 
-const defaultSchedule: WaterLog[] = [
-  { time: '07:00', amount: 300, completed: false },
-  { time: '09:00', amount: 250, completed: false },
-  { time: '11:00', amount: 250, completed: false },
-  { time: '13:00', amount: 300, completed: false },
-  { time: '15:00', amount: 250, completed: false },
-  { time: '17:00', amount: 250, completed: false },
-  { time: '19:00', amount: 200, completed: false },
-  { time: '21:00', amount: 200, completed: false },
-]
-
 export function Hydration() {
-  const [schedule, setSchedule] = useState<WaterLog[]>(defaultSchedule)
+  const { user } = useAuth()
+  const [schedule, setSchedule] = useState<WaterLog[]>([])
   const [customAmount, setCustomAmount] = useState(250)
+  const [dailyGoal, setDailyGoal] = useState(2000)
+  const [consumed, setConsumed] = useState(0)
 
-  const dailyGoal = 2000 // ml
-  const consumed = schedule.filter(log => log.completed).reduce((sum, log) => sum + log.amount, 0)
+  // Carregar dados do usuário
+  useEffect(() => {
+    if (user) {
+      const hydration = UserProgressStorage.getHydration(user.id)
+      setSchedule(hydration.logs)
+      setConsumed(hydration.completed)
+      setDailyGoal(hydration.goal)
+    }
+  }, [user])
+
   const progressPercentage = Math.min((consumed / dailyGoal) * 100, 100)
 
   const handleToggleLog = (index: number) => {
+    if (!user) return
+
     const newSchedule = [...schedule]
     newSchedule[index].completed = !newSchedule[index].completed
+
+    // Atualizar no storage
+    UserProgressStorage.updateHydration(user.id, index, newSchedule[index].completed)
+
+    // Recarregar dados
+    const hydration = UserProgressStorage.getHydration(user.id)
+    setSchedule(hydration.logs)
+    setConsumed(hydration.completed)
 
     if (newSchedule[index].completed) {
       toast.success(`${newSchedule[index].amount}ml registrados!`, {
@@ -44,23 +56,24 @@ export function Hydration() {
     } else {
       toast.info('Registro removido')
     }
-
-    setSchedule(newSchedule)
   }
 
   const handleAddCustom = () => {
+    if (!user) return
+
     const now = new Date()
     const timeString = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
-    const newLog: WaterLog = {
-      time: timeString,
-      amount: customAmount,
-      completed: true,
-    }
+    // Adicionar quantidade personalizada
+    UserProgressStorage.addCustomHydration(user.id, customAmount)
 
-    setSchedule([...schedule, newLog])
+    // Recarregar dados
+    const hydration = UserProgressStorage.getHydration(user.id)
+    setSchedule(hydration.logs)
+    setConsumed(hydration.completed)
+
     toast.success(`${customAmount}ml adicionados!`, {
-      description: 'Registro personalizado criado',
+      description: `Registrado às ${timeString}`,
     })
   }
 

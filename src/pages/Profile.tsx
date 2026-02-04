@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserProgressStorage } from '@/lib/userProgress'
+import type { UserProgress } from '@/lib/userProgress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -19,32 +23,36 @@ import {
 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
 
 export function Profile() {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
 
-  const handleLogout = () => {
-    localStorage.removeItem('fitflow_authenticated')
-    localStorage.removeItem('fitflow_remember')
-    toast.success('Logout realizado com sucesso!')
-    setTimeout(() => {
-      navigate('/login')
-    }, 1000)
+  useEffect(() => {
+    if (user) {
+      const progress = UserProgressStorage.get(user.id)
+      setUserProgress(progress)
+    }
+  }, [user])
+
+  if (!user || !userProgress) {
+    return null
   }
+
   const userData = {
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
+    name: user.name,
+    email: user.email,
     joinDate: 'Janeiro 2024',
     plan: 'Premium',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao',
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`,
   }
 
   const stats = {
-    totalWorkouts: 87,
-    currentStreak: 12,
-    caloriesBurned: 24500,
-    achievements: 15,
+    totalWorkouts: userProgress.workoutsCompleted,
+    currentStreak: userProgress.streak,
+    caloriesBurned: userProgress.workoutsCompleted * 350, // Estimativa
+    achievements: Math.floor(userProgress.workoutsCompleted / 5), // 1 achievement a cada 5 treinos
   }
 
   const goals = [
@@ -101,7 +109,7 @@ export function Profile() {
                 <Settings className="h-4 w-4 mr-2" />
                 Editar Perfil
               </Button>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" onClick={logout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>

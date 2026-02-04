@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserProgressStorage } from '@/lib/userProgress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -169,20 +171,58 @@ const mockWorkouts: Workout[] = [
 ]
 
 export function Workouts() {
+  const { user } = useAuth()
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
   const [workouts, setWorkouts] = useState<Workout[]>(mockWorkouts)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+
+  // Carregar histórico de treinos do usuário
+  useEffect(() => {
+    if (user) {
+      const progress = UserProgressStorage.get(user.id)
+
+      // Marcar treinos como completados baseado no histórico
+      const updatedWorkouts = mockWorkouts.map(workout => {
+        const completed = progress.workoutHistory.some(h => h.id === workout.id)
+        return { ...workout, completed }
+      })
+
+      setWorkouts(updatedWorkouts)
+    }
+  }, [user])
 
   const weekProgress = workouts.filter(w => w.completed).length
   const totalWorkouts = workouts.length
 
   const handleCompleteWorkout = (workoutId: string) => {
+    if (!user) return
+
+    const workout = workouts.find(w => w.id === workoutId)
+    if (!workout) return
+
+    const wasCompleted = workout.completed
+
     setWorkouts(prev =>
       prev.map(w => (w.id === workoutId ? { ...w, completed: !w.completed } : w))
     )
-    toast.success('Treino marcado como concluído!', {
-      description: 'Continue assim! Você está no caminho certo.',
-    })
+
+    if (!wasCompleted) {
+      // Marcar como completo - adicionar ao progresso
+      UserProgressStorage.updateWorkouts(user.id, 1)
+      UserProgressStorage.addWorkoutToHistory(user.id, {
+        id: workout.id,
+        dayNumber: workout.dayNumber,
+        title: workout.title
+      })
+      UserProgressStorage.syncWithUserStorage(user.id)
+
+      toast.success('Treino marcado como concluído! 🎉', {
+        description: 'Continue assim! Você está no caminho certo.',
+      })
+    } else {
+      // Desmarcar - precisaria remover do histórico (não implementado)
+      toast.info('Treino desmarcado')
+    }
   }
 
   const filteredWorkouts = selectedDay
