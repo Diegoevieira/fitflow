@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dumbbell, Clock, Flame, ChevronRight, Play, Target, TrendingUp, CheckCircle2, Calendar, Activity } from 'lucide-react'
+import { Dumbbell, Clock, Flame, Play, Target, TrendingUp, CheckCircle2, Calendar, Activity } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
