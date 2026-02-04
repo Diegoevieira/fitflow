@@ -6,6 +6,7 @@ import { AdminLogin } from '@/pages/AdminLogin'
 import { Welcome } from '@/pages/Welcome'
 import { Dashboard } from '@/pages/Dashboard'
 import { Workouts } from '@/pages/Workouts'
+import { Diet } from '@/pages/Diet'
 import { Hydration } from '@/pages/Hydration'
 import { Community } from '@/pages/Community'
 import { Profile } from '@/pages/Profile'
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="workouts" element={<Workouts />} />
+          <Route path="diet" element={<Diet />} />
           <Route path="hydration" element={<Hydration />} />
           <Route path="community" element={<Community />} />
           <Route path="profile" element={<Profile />} />

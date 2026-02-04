@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Dumbbell, Droplets, Users, User, Shield, LogOut } from 'lucide-react'
+import { Home, Dumbbell, Utensils, Droplets, Users, User, Shield, LogOut } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ export function Layout() {
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
     { path: '/workouts', icon: Dumbbell, label: 'Treinos' },
+    { path: '/diet', icon: Utensils, label: 'Dieta' },
     { path: '/hydration', icon: Droplets, label: 'Hidratação' },
     { path: '/community', icon: Users, label: 'Comunidade' },
     { path: '/profile', icon: User, label: 'Perfil' },
