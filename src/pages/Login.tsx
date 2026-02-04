@@ -46,7 +46,7 @@ export function Login() {
         {/* Left Side - Branding */}
         <div className="hidden md:flex flex-col items-center justify-center space-y-6 p-8">
           <img
-            src="/alt logo.png"
+            src="/fundo transparente.png"
             alt="FitFlow"
             className="h-32 w-auto object-contain mb-4"
           />
@@ -96,7 +96,7 @@ export function Login() {
         <Card className="w-full">
           <CardHeader className="text-center md:hidden">
             <img
-              src="/alt logo.png"
+              src="/fundo transparente.png"
               alt="FitFlow"
               className="h-20 w-auto object-contain mx-auto mb-4"
             />

@@ -22,7 +22,7 @@ export function Layout() {
         <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="/alt logo.png"
+              src="/fundo transparente.png"
               alt="FitFlow"
               className="h-16 w-auto object-contain"
             />
