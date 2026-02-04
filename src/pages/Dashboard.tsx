@@ -198,7 +198,7 @@ export function Dashboard() {
       </Card>
 
       {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Link to="/workouts">
           <Card className="hover:shadow-lg transition-all cursor-pointer h-full">
             <CardContent className="pt-6">
@@ -208,20 +208,6 @@ export function Dashboard() {
                 </div>
                 <h3 className="font-semibold mb-1">Ver Treinos</h3>
                 <p className="text-sm text-muted-foreground">Acesse seu plano semanal</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link to="/diet">
-          <Card className="hover:shadow-lg transition-all cursor-pointer h-full">
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center text-center">
-                <div className="p-3 rounded-full bg-secondary/10 mb-3">
-                  <Utensils className="h-6 w-6 text-secondary" />
-                </div>
-                <h3 className="font-semibold mb-1">Minha Dieta</h3>
-                <p className="text-sm text-muted-foreground">Veja seu plano alimentar</p>
               </div>
             </CardContent>
           </Card>
